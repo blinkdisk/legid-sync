@@ -27,10 +27,10 @@ for (let length = MIN_LENGTH; length <= MAX_LENGTH; length++) {
     for (let i = 0; i < TEST_ITERATIONS; i++) {
       try {
         // Generate ID
-        const id = await createId({ approximateLength: length, step })
+        const id = createId({ approximateLength: length, step })
 
         // Verify ID
-        const isValid = await verifyId(id, { step })
+        const isValid = verifyId(id, { step })
 
         totalTests++
         if (isValid) {
@@ -64,7 +64,7 @@ let correctlyRejected = 0
 for (let i = 0; i < TEST_ITERATIONS; i++) {
   try {
     // Generate a valid ID
-    const validId = await createId(10)
+    const validId = createId(10)
 
     // Create wrong token by modifying the ID
     let wrongId = validId
@@ -85,7 +85,7 @@ for (let i = 0; i < TEST_ITERATIONS; i++) {
     }
 
     // Verify wrong ID (should fail)
-    const isValid = await verifyId(wrongId)
+    const isValid = verifyId(wrongId)
 
     wrongTokenTests++
     if (!isValid) {
@@ -108,7 +108,7 @@ console.log("=".repeat(50))
 
 // Test empty string
 try {
-  const emptyResult = await verifyId("")
+  const emptyResult = verifyId("")
   console.log(`Empty string verification: ${emptyResult ? "❌ PASSED (should fail)" : "✅ FAILED (correct)"}`)
 } catch (error) {
   console.log(`Empty string verification: ✅ THREW ERROR (correct)`)
@@ -116,7 +116,7 @@ try {
 
 // Test very short ID
 try {
-  const shortResult = await verifyId("a")
+  const shortResult = verifyId("a")
   console.log(`Very short ID verification: ${shortResult ? "❌ PASSED (should fail)" : "✅ FAILED (correct)"}`)
 } catch (error) {
   console.log(`Very short ID verification: ✅ THREW ERROR (correct)`)
@@ -124,7 +124,7 @@ try {
 
 // Test invalid characters (if any exist outside our alphabet)
 try {
-  const invalidResult = await verifyId("invalid@#$")
+  const invalidResult = verifyId("invalid@#$")
   console.log(`Invalid chars verification: ${invalidResult ? "❌ PASSED (should fail)" : "✅ FAILED (correct)"}`)
 } catch (error) {
   console.log(`Invalid chars verification: ✅ THREW ERROR (correct)`)
@@ -138,7 +138,7 @@ const words = badWordsList.array.concat([
 ])
 let wordPassed = 0
 for (const word of words) {
-  const result = await verifyId(word)
+  const result = verifyId(word)
   if (result) {
     wordPassed++
     console.log(`Word "${word}" unexpectedly validated`)

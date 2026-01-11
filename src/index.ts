@@ -1,3 +1,5 @@
+import { sha1 } from 'js-sha1'
+
 // Default salt prefix for ID generation
 const SALT = 'legid:'
 
@@ -89,35 +91,15 @@ function generateRandomHexToken(length: number): string {
 }
 
 /**
- * Converts ArrayBuffer to hex string
- */
-function arrayBufferToHex(buffer: ArrayBuffer): string {
-  const byteArray = new Uint8Array(buffer)
-  return Array.from(byteArray, (byte) =>
-    byte.toString(16).padStart(2, '0')
-  ).join('')
-}
-
-/**
- * Computes SHA-1 hash using SubtleCrypto
- */
-async function sha1(text: string): Promise<string> {
-  const encoder = new TextEncoder()
-  const data = encoder.encode(text)
-  const hashBuffer = await crypto.subtle.digest('SHA-1', data)
-  return arrayBufferToHex(hashBuffer)
-}
-
-/**
  * Creates a random ID
  * ID structure: chars at odd positions are from token, chars at even positions are from hash
  * Uses hex internally, converts to custom alphabet at the end
  */
-export async function createId({
+export function createId({
   approximateLength = DEFAULT_ID_LENGTH,
   salt = SALT,
   step = 2,
-} = {}): Promise<string> {
+} = {}): string {
   if (approximateLength <= 0) {
     throw new Error('ID length must be a positive integer')
   }
@@ -143,7 +125,7 @@ export async function createId({
   )
 
   // Calculate hash
-  const hexHash = await sha1(salt + hexToken)
+  const hexHash = sha1(salt + hexToken)
 
   // Create hex ID
   let hexId = ''
@@ -165,10 +147,10 @@ export async function createId({
  * Verifies if an ID was created from the createId process
  * Converts from custom alphabet back to hex, then verifies
  */
-export async function verifyId(
+export function verifyId(
   id: string,
   { salt = SALT, step = 2 } = {}
-): Promise<boolean> {
+): boolean {
   if (!id || id.length > MAX_ID_LENGTH) {
     return false // Invalid ID length
   }
@@ -194,7 +176,7 @@ export async function verifyId(
     }
 
     // Calculate expected hex value
-    const expectedHexValue = await sha1(salt + extractedHexToken)
+    const expectedHexValue = sha1(salt + extractedHexToken)
 
     // It must be a prefix match
     return expectedHexValue.startsWith(extractedHexHash)
